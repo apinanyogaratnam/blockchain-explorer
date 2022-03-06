@@ -2,12 +2,14 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
+import { connect } from "@textile/tableland"
 
 
 export default function Home() {
   const [address, setAddress] = React.useState('');
   const [mintedNFTs, setMintedNFTs] = React.useState([]);
   const [covalentData, setCovalentData] = useState([]);
+  const [tableLandData, setTableLandData] = useState([]);
 
   const mintNFT = async () => {
     if (!address) {
@@ -43,6 +45,25 @@ export default function Home() {
     setCovalentData(covalentRes.data.data);
   };
 
+  const displayTableLandData = async () => {
+    displayData();
+    const tbl = await connect({ network: "testnet" });
+
+    const createRes = await tbl.create(
+      `CREATE TABLE mytable (name text, id int, primary key (id));`
+    );
+
+    // `queryableName` will be the table name you chose with the
+    // table id separated by and underscore 
+    const queryableName = createRes.name;
+    console.log(queryableName); // e.g. mytable_1
+
+    const insertRes = await tbl.query(`INSERT INTO ${queryableName} (id, name) VALUES (0, '${JSON.stringify(covalentData)}');`);
+
+    const queryRes = await tbl.query(`SELECT * FROM ${queryableName};`);
+    setTableLandData(queryRes.data);
+  };
+
   return (
     <div className={styles.container}>
       <h1>Blockchain Explorer</h1>
@@ -50,7 +71,7 @@ export default function Home() {
       <button onClick={mintNFT}>Claim Free NFT</button>
       <button onClick={displayData}>View my data</button>
       {
-        covalentData && JSON.stringify(covalentData)
+        tableLandData && JSON.stringify(tableLandData)
       }
     </div>
   )
