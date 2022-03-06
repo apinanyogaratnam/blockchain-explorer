@@ -7,6 +7,7 @@ import axios from 'axios'
 export default function Home() {
   const [address, setAddress] = React.useState('');
   const [mintedNFTs, setMintedNFTs] = React.useState([]);
+  const [covalentData, setCovalentData] = useState([]);
 
   const mintNFT = async () => {
     if (!address) {
@@ -34,13 +35,23 @@ export default function Home() {
     const res = await axios.post(urlToMint, body, auth);
     console.log(res.data.transaction_external_url);
     setMintedNFTs([...mintedNFTs, res.data.transaction_external_url]);
-  };  
+  };
+
+  const displayData = async () => {
+    const covalent = "https://api.covalenthq.com/v1/1/address/" + address + "/transactions_v2/?quote-currency=USD&format=JSON&block-signed-at-asc=false&no-logs=false&key=" + process.env.NEXT_PUBLIC_COVALENT_API_KEY;
+    const covalentRes = await axios.get(covalent);
+    setCovalentData(covalentRes.data.data);
+  };
 
   return (
     <div className={styles.container}>
       <h1>Blockchain Explorer</h1>
       <input type="text" placeholder="Enter an address" value={address} onChange={(e) => setAddress(e.target.value)} />
       <button onClick={mintNFT}>Claim Free NFT</button>
+      <button onClick={displayData}>View my data</button>
+      {
+        covalentData && JSON.stringify(covalentData)
+      }
     </div>
   )
 }
