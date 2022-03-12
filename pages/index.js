@@ -3,13 +3,14 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { connect } from "@textile/tableland"
+import React from 'react'
 
 
 export default function Home() {
   const [address, setAddress] = React.useState('');
   const [mintedNFTs, setMintedNFTs] = React.useState([]);
-  const [covalentData, setCovalentData] = useState([]);
-  const [tableLandData, setTableLandData] = useState([]);
+  const [covalentData, setCovalentData] = React.useState([]);
+  const [tableLandData, setTableLandData] = React.useState(null);
 
   const mintNFT = async () => {
     if (!address) {
@@ -69,9 +70,12 @@ export default function Home() {
       <h1>Blockchain Explorer</h1>
       <input type="text" placeholder="Enter an address" value={address} onChange={(e) => setAddress(e.target.value)} />
       <button onClick={mintNFT}>Claim Free NFT</button>
-      <button onClick={displayData}>View my data</button>
+      <button onClick={displayTableLandData}>View my data</button>
       {
         tableLandData && JSON.stringify(tableLandData)
+      }
+      {
+        covalentData && JSON.stringify(covalentData)
       }
     </div>
   )
